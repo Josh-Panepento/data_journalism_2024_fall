@@ -41,3 +41,29 @@ library(tidyverse)
 print("Hello World")
 
 ```
+
+### How to print a number with math
+
+```{r}
+
+2+2
+
+```
+
+### How to install packages
+
+```{r}
+
+install.packages('tidyverse')
+
+```
+
+### How to add multiple variables
+
+```{r}
+
+firstnumber <- 1
+secondnumber <- 2 
+(firstnumber + secondnumber) * secondnumber
+
+```
