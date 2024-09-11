@@ -58,9 +58,7 @@ glimpse(westvirginia_winred_contributions)
 ```{r}
 westvirginia_winred_contributions |>
   group_by(city) |>
-  summarise(
-    count_contribs = n()
-  ) |>
+  summarise(count_contribs = n()) |>
   arrange(desc(count_contribs))
 ```
 
@@ -108,7 +106,8 @@ Store it as a variable object called `wv_summary` so that you can examine it wit
 
 ```{r}
 westvirginia_winred_contributions |>
-  group_by(memo_text) |>
+  filter(memo_text != 'Refund of Earmarked Contribution') |>
+  group_by (state) |>
   summarise(
     count_contribs = n(),
     total_amount = sum(amount),
@@ -116,6 +115,5 @@ westvirginia_winred_contributions |>
     median_amount = median(amount),
     min_amount = min(amount),
     max_amount = max(amount)
-  ) |>
-  arrange(desc(total_amount))
+  )
 ```
