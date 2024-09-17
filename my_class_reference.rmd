@@ -67,3 +67,14 @@ secondnumber <- 2
 (firstnumber + secondnumber) * secondnumber
 
 ```
+
+### How to select
+
+```{r}
+primary_24 |>
+  select(office_name, office_district, candidate_name, party, county_name, election_day, votes) |>
+  mutate(
+  percent_election_day = (election_day/votes)*100
+)  |> 
+  arrange(desc(percent_election_day))
+```
