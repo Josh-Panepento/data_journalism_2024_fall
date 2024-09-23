@@ -60,7 +60,7 @@ problems(texas_precinct_20)
 **Answer** This time, it did not have a warning or problems.
 
 ```{r}
-texas_precinct_20 <- read_csv("data/tx_precinct_2020.csv", guess_max=476915)
+texas_precinct_20 <- read_csv("data/tx_precinct_2020.csv", guess_max=476915) ##guess max is the number of rows
 ```
 
 ### Task 5: Examine the data with glimpse
@@ -93,7 +93,7 @@ We can fix that pretty easily, by changing that value to "49" using `case_when` 
 texas_precinct_20 <- texas_precinct_20 |>
   mutate(election_day = case_when(
     election_day == '5+' ~ '49',
-    .default = election_day
+    TRUE ~ election_day ##This keeps everything else the same
   ))
 
 texas_precinct_20 <- texas_precinct_20 |> mutate(election_day = as.numeric(election_day))
@@ -108,7 +108,6 @@ glimpse(texas_precinct_20)
 **Answer** There are over 400 thousand that say NA. I think this means that there is missing data.
 
 ```{r}
-
 texas_precinct_20 |> 
   group_by(mail) |> 
   summarise(
@@ -150,7 +149,7 @@ yadkin_voters <- read_csv("data/yadkin_voters.csv")
 
 ```{r}
 yadkin_voters |> 
-  mutate(registration_month = floor_date(registr_dt, "month")) |>
+  mutate(registration_month = floor_date(registr_dt, "month")) |> ##floor shows totals for the month
   group_by(registration_month) |> 
    summarise(
     count=n()
