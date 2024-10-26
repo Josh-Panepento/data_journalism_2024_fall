@@ -53,9 +53,6 @@ In this notebook, we are reverse engineering five sentences from the story.
 * **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
 
 ```
 
@@ -96,14 +93,24 @@ moore_total_md
 
 ### Sentence 4
 
-* **Sentence text**: ["Moore, King and Perez stand in stark contrast to Peter Franchot, a former Maryland state delegate and current comptroller, who raised over 78% of his $1.66 million from inside Maryland."]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: "Moore, King and Perez stand in stark contrast to Peter Franchot, a former Maryland state delegate and current comptroller, who raised over 78% of his $1.66 million from inside Maryland."
+* **Analysis summary**: The reverse engineering produced the same findings as the report. My code found that 78.07% of Peter Franchot's contributions came from Maryland contributors.
 
 ```{r}
-# Put code to reverse engineer sentence here
+franchot_contribs <- read_csv("~/Documents/github-2024/GitHub/data_journalism_2024_fall/major_assignments/reverse_engineering/data/franchot_contribs.csv")
 
-# Display results of code below this codeblock
+franchot_contribs <- franchot_contribs %>%
+  mutate(state = str_extract(`Contributor Address`, "\\b[A-Z]{2}\\b"))
 
+md_contributions <- franchot_contribs %>% 
+  filter(state == "MD")
+
+total_md_contributions <- sum(md_contributions$`Contribution Amount`, na.rm = TRUE)
+total_contributions <- sum(franchot_contribs$`Contribution Amount`, na.rm = TRUE)
+
+md_percentage <- (total_md_contributions / total_contributions) * 100
+
+md_percentage
 ```
 
 ### Sentence 5
