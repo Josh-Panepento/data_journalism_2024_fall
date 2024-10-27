@@ -22,6 +22,7 @@ options(scipen=999)
 # Load libraries
 library(tidyverse)
 library(ggthemes)
+library(ggplot2)
 ```
 
 ## Load data
@@ -102,14 +103,23 @@ maryland_dem_returned |>
 ```
 **Q3** Let's make a line chart using the second set of absentee ballot data - this one tracking returns by date. We want to see received ballots for Frederick County for Democrats, Republicans and Others, so you'll make a chart with three lines, adding color to each one (you can choose, but choose sensibly). Give the chart a title and good labels. What's the story that this line chart tells? Compare and contrast the three lines. Does it match what you know about absentee voting habits?
 
-**A3** 
+**A3** It shows that the absentee ballots received from democrats is much higher which makes sense since we live in a blue state. Also, it shows that the democrats line increases its incline closer to the election date while the other two have a consistent rise. This matches what I knew about absentee voting habits and how there is an increase right before the election. It also matches my knowledge of the amount of democrats in this area compared to all others.
 
 ```{r}
-md_absentee_ballots_date |>
-  ggplot() + 
-  geom_line(aes(x=DATE, y=`DEM RECEIVED`))
-  scale_x_date(date_breaks = "1 day", date_labels = "%b %d")
+frederick_absentee <- md_absentee_ballots_date |> 
+  filter(`COUNTY NAME` == "FREDERICK")
 
+ggplot(frederick_absentee, aes(x = DATE)) +
+  geom_line(aes(y = `DEM RECEIVED`, color = "Democrats")) +
+  geom_line(aes(y = `REP RECEIVED`, color = "Republicans")) +
+  geom_line(aes(y = `OTH RECEIVED`, color = "Others")) +
+  labs(
+    title = "Absentee Ballots Received in Frederick County",
+    x = "Date",
+    y = "Number of Received Ballots",
+    color = "Party Affiliation"
+  ) +
+  scale_color_manual(values = c("Democrats" = "blue", "Republicans" = "red", "Others" = "green"))
 ```
 
 **Q4.** A scatterplot is a type of chart that helps us see relationships between two variables. One variable goes on the x axis, the other on the y axis. For each row/observation in our data, a scatterplot puts a circle (or a "point") where the two variables intersect on a grid.
@@ -130,9 +140,17 @@ Follow these steps:
 4. Add a line of fit to the plot using geom_smooth (https://ggplot2.tidyverse.org/reference/geom_smooth.html#ref-examples). Specify the method as lm.
 5. In the answer space below, describe what you see. In a general sense, how would you report out the main point(s) of this chart? Are there counties that seem to be over or under-performing in relation to the overall trend?
 
-**A4.** 
+**A4.** I can see how Montgomery has a much larger received and sent than every other county. I can also see that there is a large clump near the bottom of most other counties. Montgomery is clearly over performing while counties like Allegany is under performing.
 
 ```{r}
-
-  
+md_absentee_ballots |>
+ggplot(aes(x = `TOTAL SENT`, y = `TOTAL RECEIVED`)) +
+  geom_point() +
+  geom_text(aes(label = `COUNTY NAME`), hjust = 1.2, vjust = 0.5, size = 3, check_overlap = TRUE) + 
+  labs(
+    title = "Ballots Sent and Ballots Received by County in Maryland",
+    x = "Total Ballots Sent",
+    y = "Total Ballots Received",
+    caption = "Source: Maryland Absentee Ballot Data"
+  )
 ```
