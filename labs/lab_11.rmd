@@ -111,24 +111,19 @@ urls <- press_releases |>
   html_attr("href") |> 
   as_tibble()
 
-# Extract dates (update selector if necessary)
 dates <- cardin_page |> 
-  html_elements(".entry-date") |>  # Update selector for date
+  html_elements(".entry-date") |> 
   html_text(trim = TRUE) |> 
   as_tibble()
 
-# Combine columns into a single dataframe
 press_releases_data <- bind_cols(
   date = dates$value,
   title = titles$value,
-  url = urls$value
-)
+  url = urls$value)
 
-# Clean and process the dataframe
 press_releases_data <- press_releases_data |>
   rename(Date = date, Title = title, URL = url) |>
-  mutate(Date = mdy(Date))  # Convert date to Date type if in "MM/DD/YYYY" format
+  mutate(Date = mdy(Date))
 
-# View the final dataframe
 print(press_releases_data)
 ```
