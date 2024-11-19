@@ -61,26 +61,20 @@ You should have 10 releases when finished, not 20.
 
 Then, write code that finds the most recent release with the word "Campaign" in the title. What election does it refer to?
 
-**A2** The most recent release with the word "campaign" in the title is from April, it is referring to the governor race and advocating for John King.
+**A2** The most recent release with the word "campaign" in the title is from April, it is referring to the governor race for John King.
 
 ```{r}
-press_releases_url <- "https://osp.maryland.gov/category/press-releases/"
+results <- "https://osp.maryland.gov/category/press-releases/" |>
+  read_html() |>
+  html_elements("article a")
 
-press_releases <- read_html(press_releases_url)
-
-press_releases <- press_releases |> 
-  html_elements("li")
-
-press_releases <- tibble(
-  title = press_releases |> html_element("a") |> html_text(trim = TRUE),
-  url = press_releases |> html_element("a") |> html_attr("href"),
-  date = press_releases |> html_element("a") |> html_text(trim = TRUE) |> 
-    str_extract("\\b\\d{4}-\\d{2}-\\d{2}\\b"))
-
-press_releases <- press_releases |>
-  separate(title, into = c("date", "clean_title"), sep = " - ", extra = "merge")
-
-press_releases
+tibble(
+  title = results |> html_text(),
+  url = results |> html_attr("href")
+) |>
+  seperate(title, c("date", "title"), ": ") |>
+  filter(date != "Read the Rest...") |>
+  filter(str_detect(title, "campaign|Campaign"))
 ```
 
 **Q3** Sen. Ben Cardin, D-Maryland, has posted hundreds of press releases at <https://www.cardin.senate.gov/?post_type=press-releases>. It would be great to have all of them in a dataframe that has the following columns: date, title and url.
@@ -96,34 +90,27 @@ Finally, tell me what questions you could ask of this data, and what other infor
 **A3** I would want to know more about the most common topics covered in the press releases and how that changes depending on where we are in the campaign process. To go with this I would want to know the audience engagement of this data like number of views, shares, etc. With these two combined I would be able to see which topics/issues the public cares most about.
 
 ```{r}
-cardin_url <- "https://www.cardin.senate.gov/?post_type=press-releases"
+html <- read_html("https://www.cardin.senate.gov/?post_type=press-releases")
+  
+dates <- html |>  
+  html_elements("h5") |>
+  html_text() |>
+  as.tibble()
 
-cardin_page <- read_html(cardin_url)
+titles <- html |>
+  html_elements("h3") |>
+  html_text(trim = TRUE) |>
+  as.tibble()
 
-press_releases <- cardin_page |> 
-  html_elements(".post-title a")
-
-titles <- press_releases |> 
-  html_text(trim = TRUE) |> 
+urls <- html |> 
+  html_elements("h3 a") |>
+  html_attr("href") |>
   as_tibble()
 
-urls <- press_releases |> 
-  html_attr("href") |> 
-  as_tibble()
-
-dates <- cardin_page |> 
-  html_elements(".entry-date") |> 
-  html_text(trim = TRUE) |> 
-  as_tibble()
-
-press_releases_data <- bind_cols(
-  date = dates$value,
-  title = titles$value,
-  url = urls$value)
-
-press_releases_data <- press_releases_data |>
-  rename(Date = date, Title = title, URL = url) |>
-  mutate(Date = mdy(Date))
-
-print(press_releases_data)
+dates |>
+  bind_cols(titles, urls) |>
+  clean_names() |>
+  rename(date = value_1,
+         title = value_2,
+         url = value_3)
 ```
