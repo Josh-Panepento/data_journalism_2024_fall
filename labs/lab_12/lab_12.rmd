@@ -29,7 +29,7 @@ library(rvest)
 
 **Q1.** You've been assigned to report a story about the leading reasons that Maryland attorneys get sanctioned by the state for misconduct. The state [publishes lists of sanctions](https://www.courts.state.md.us/attygrievance/sanctions) that contain a short text description about the situation. Load the CSV file in the data folder containing records from fiscal year 2011 onwards. Make a list of unique words from the text column, then following the example in the pre_lab, remove common "stop words" from that list and create a list of the top 10 words containing the percentage of occurrences each word represents. What's the leading word in that answer and, broadly, what do you think the top 10 words describe?
 
-**A1.** The top answer is "failing" and it is three percent higher than the next leading word. I think overall these words like "funds" and "account" are associated with money so that may be what these people did to get sanctioned.
+**A1.** The top answer is "failing" and it is three percent higher than the next leading word. I think overall these words like "funds" and "account" are associated with money so that may be the main issue in these sanctions.
 
 ```{r}
 sanctions <- read_csv("data/md_attorney_sanctions.csv")
@@ -91,7 +91,5 @@ sanctions |>
   mutate(trigram = paste(word1, word2, word3, sep=" ")) |>
   filter(trigram == "attorney trust account") |>
   group_by(fiscal_year, trigram) |>
-  tally(sort=TRUE) |>
-  mutate(percent = (n/sum(n))*100) |>
-  top_n(10)
+  tally(sort=TRUE)
 ```
