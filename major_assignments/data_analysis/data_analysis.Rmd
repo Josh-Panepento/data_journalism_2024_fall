@@ -27,6 +27,7 @@ Loading required libraries for this analysis.
 ```{r echo=FALSE, message=FALSE}
 library(tidyverse)
 library(janitor)
+library(tidytext)
 ```
 
 ## Load and Cleaning Data
@@ -60,9 +61,9 @@ A1:
 
 ```{r}
 emails <- emails |>
-  group_by(sent) |>
+  group_by() |>
   summarize(email_count = n()) |>
-  arrange(desc(email_count)) 
+  arrange(desc(email_count))
 ```
 
 Q2: During the election cycle, how frequently are emails sent? Which months/days saw the most volume?
@@ -70,8 +71,8 @@ Q2: During the election cycle, how frequently are emails sent? Which months/days
 A2:
 
 ```{r}
-emails_by_month <- emails |>
-  group_by(month) |>
+emails_by_time <- emails |>
+  group_by(time) |>
   summarize(email_count = n()) |>
   arrange(desc(email_count)) 
 
@@ -84,14 +85,6 @@ emails_by_day <- emails |>
 Q3: What types of messages are they and does this vary by party? (Ex. are the emails about fundraising, event invitations, policy stances, etc.)
 
 A3:
-
-```{r}
-
-```
-
-Q4: Do the emails contain any polarization or fear-mongering language and does this vary by party? (words like “fight”, “invasion”, etc.)
-
-A4:
 
 ```{r}
 unique_words <- emails |>
@@ -111,6 +104,33 @@ word_counts_by_party <- emails |>
   mutate(percent = (n / sum(n)) * 100)
 
 word_counts_by_party
+```
+
+Q4: Do the emails contain any polarization or fear-mongering language and does this vary by party? (words like “fight”, “invasion”, etc.)
+
+A4:
+
+```{r}
+unique_words <- emails |>
+  select(body) |>
+  unnest_tokens(word, body) |>
+  anti_join(stop_words, by = "word") |>
+  filter(word %in% c("fight", "invasion"))
+
+word_counts <- unique_words |>
+  count(word, sort = TRUE) |>
+  mutate(percent = (n / sum(n)) * 100)
+
+fear_words_by_party <- emails |>
+  select(body, party) |>
+  unnest_tokens(word, body) |>
+  anti_join(stop_words, by = "word") |>
+  filter(word %in% c("fight", "invasion")) |>
+  count(party, word, sort = TRUE) |>
+  group_by(party) |>
+  mutate(percent = (n / sum(n)) * 100)
+
+fear_words_by_party
 ```
 
 Q5: How much money is the fundraising email asking for? Does this change depending on the month?
